@@ -29,10 +29,10 @@ async def get_signal(ticker: str, date: str = None, force: bool = False):
     if not date:
         date = datetime.now().strftime("%Y-%m-%d")
     
-    # 🕵️ Auto-Discovery & Preparation
+    # Auto-discovery and preparation
     ohlcv_path = f"data/{ticker}_ohlcv.csv"
     if force or not os.path.exists(ohlcv_path):
-        print(f"🚀 Préparation des données pour {ticker} (Force={force})...")
+        print(f"Preparing data for {ticker} (Force={force})...")
         success = download_ticker(ticker, period="5y", force=force)
         if not success:
             raise HTTPException(status_code=404, detail=f"Ticker {ticker} introuvable sur yfinance.")
