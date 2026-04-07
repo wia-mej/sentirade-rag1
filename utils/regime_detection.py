@@ -1,34 +1,44 @@
 import pandas as pd
 import numpy as np
-from sklearn.mixture import GaussianMixture # pour la détection de régimes
-from sklearn.preprocessing import StandardScaler # pour normaliser les features avant GMM
+from sklearn.mixture import GaussianMixture
+from sklearn.preprocessing import StandardScaler
+import os
 
-# Charger les features
-features = pd.read_csv("data/features_technical.csv", index_col=0, parse_dates=True)
-feature_cols = ["rsi", "volatility", "ma_spread"]
+def update_regime_labels():
+    """
+    Recalcule les régimes pour tous les tickers dans features_technical.csv
+    """
+    path = "data/features_technical.csv"
+    if not os.path.exists(path):
+        return
+    
+    features = pd.read_csv(path, index_col=0, parse_dates=True)
+    feature_cols = ["rsi", "volatility", "ma_spread"]
+    
+    scaler = StandardScaler()
+    X = scaler.fit_transform(features[feature_cols])
+    
+    gmm = GaussianMixture(n_components=3, random_state=42)
+    features["regime_id"] = gmm.fit_predict(X)
+    
+    features[["ticker", "regime_id"]].to_csv("data/regime_labels.csv")
+    print("✅ regime_labels.csv mis à jour")
+    return features
 
-# Normalisation
-scaler = StandardScaler()
-X = scaler.fit_transform(features[feature_cols])
-
-# GMM avec 3 régimes
-gmm = GaussianMixture(n_components=3, random_state=42)
-features["regime_id"] = gmm.fit_predict(X)
-
-# Sauvegarder
-features[["ticker", "regime_id"]].to_csv("data/regime_labels.csv")
-print("✅ regime_labels.csv généré")
-print(features["regime_id"].value_counts())
-
-# Fonction get_regime()
 def get_regime(ticker, date):
-    df = pd.read_csv("data/regime_labels.csv", index_col=0, parse_dates=True)
+    df_path = "data/regime_labels.csv"
+    if not os.path.exists(df_path):
+        update_regime_labels()
+        
+    df = pd.read_csv(df_path, index_col=0, parse_dates=True)
     row = df[(df["ticker"] == ticker) & (df.index == date)]
     if row.empty:
-        return None
+        # Si la date n'est pas trouvée, on prend le régime le plus récent
+        ticker_df = df[df["ticker"] == ticker]
+        if not ticker_df.empty:
+            return int(ticker_df.iloc[-1]["regime_id"])
+        return 1 # Défaut: calme
     return int(row["regime_id"].values[0])
 
-# Test rapide
 if __name__ == "__main__":
-    result = get_regime("AAPL", "2023-06-01")
-    print(f"✅ Régime AAPL le 2023-06-01 : {result}")
+    update_regime_labels()

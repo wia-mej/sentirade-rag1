@@ -2,31 +2,46 @@ import pandas as pd
 import numpy as np
 import os
 
-# Fonction pour calculer le RSI (Relative Strength Index)
 def compute_rsi(series, period=14):
     delta = series.diff()
-    gain = delta.clip(lower=0).rolling(period).mean()
-    loss = -delta.clip(upper=0).rolling(period).mean()
+    gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
     rs = gain / loss
     return 100 - (100 / (1 + rs))
 
-tickers = ["AAPL", "TSLA", "NVDA"]
-all_features = []
-
-# Calcul des features techniques pour chaque ticker
-for ticker in tickers:
-    df = pd.read_csv(f"data/{ticker}_ohlcv.csv", parse_dates=["Date"])
+def process_features(ticker):
+    """
+    Calcule les indicateurs techniques pour un ticker donné
+    """
+    path = f"data/{ticker}_ohlcv.csv"
+    if not os.path.exists(path):
+        return None
+    
+    df = pd.read_csv(path, parse_dates=["Date"])
     df = df.set_index("Date")
 
     feat = pd.DataFrame(index=df.index)
     feat["ticker"] = ticker
     feat["rsi"] = compute_rsi(df["Close"])
     feat["volatility"] = df["Close"].pct_change().rolling(14).std()
-    feat["ma_spread"] = df["Close"].rolling(10).mean() - df["Close"].rolling(50).mean()
+    ma_10 = df["Close"].rolling(10).mean()
+    ma_50 = df["Close"].rolling(50).mean()
+    feat["ma_spread"] = (ma_10 - ma_50) / ma_50
+    
+    # Mettre à jour le fichier global
+    output_path = "data/features_technical.csv"
+    if os.path.exists(output_path):
+        existing = pd.read_csv(output_path, index_col=0, parse_dates=True)
+        # Supprimer les anciennes features du même ticker
+        existing = existing[existing["ticker"] != ticker]
+        updated = pd.concat([existing, feat]).dropna()
+    else:
+        updated = feat.dropna()
+        
+    updated.to_csv(output_path)
+    print(f"✅ Features mises à jour pour {ticker}")
+    return updated
 
-    all_features.append(feat)
-
-# Concaténer les features de tous les tickers et les sauvegarder dans un fichier CSV
-features = pd.concat(all_features).dropna()
-features.to_csv("data/features_technical.csv")
-print(f"✅ features_technical.csv généré — {len(features)} lignes")
+if __name__ == "__main__":
+    for t in ["AAPL", "TSLA", "NVDA"]:
+        process_features(t)

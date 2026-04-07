@@ -1,32 +1,36 @@
 import pandas as pd
-import numpy as np
-import os # pour vérifier l'existence du fichier et sa taille
+import yfinance as yf
+import os
 
-tickers = ["AAPL", "TSLA", "NVDA"] # les tickers à générer
-dates = pd.date_range(start="2020-01-01", end="2024-12-31", freq="B") # génère des dates de jours ouvrables entre 2020 et 2024
+def download_ticker(ticker, period="5y", force=False):
+    """
+    Télécharge les données réelles via yfinance pour un ticker donné
+    """
+    path = f"data/{ticker}_ohlcv.csv"
+    
+    if not force and os.path.exists(path) and os.path.getsize(path) > 100:
+        print(f"⏭️ {ticker} déjà présent — skip")
+        return True
 
-prix_depart = {"AAPL": 75, "TSLA": 30, "NVDA": 60}
+    print(f"📥 Téléchargement des données pour {ticker} (période={period})...")
+    try:
+        df = yf.download(ticker, period=period)
+        if df.empty:
+            print(f"❌ Aucune donnée trouvée pour {ticker}")
+            return False
+        
+        # Nettoyage yfinance (parfois multi-index)
+        if hasattr(df.columns, 'nlevels') and df.columns.nlevels > 1:
+            df.columns = df.columns.get_level_values(0)
+            
+        df = df.reset_index()
+        df.to_csv(path, index=False)
+        print(f"✅ {ticker} sauvegardé — {len(df)} lignes")
+        return True
+    except Exception as e:
+        print(f"❌ Erreur lors du téléchargement de {ticker}: {e}")
+        return False
 
-
-# Génération de données synthétiques pour chaque ticker
-for ticker in tickers:
-    path = f"data/{ticker}_ohlcv.csv" # OHLCV = Open, High, Low, Close, Volume
-
-    if os.path.exists(path) and os.path.getsize(path) > 100:
-        print(f"⏭️ {ticker} déjà téléchargé — skip")
-        continue
-
-    np.random.seed({"AAPL": 1, "TSLA": 2, "NVDA": 3}[ticker])
-    close = prix_depart[ticker] * np.cumprod(1 + np.random.normal(0.0003, 0.02, len(dates)))
-
-    df = pd.DataFrame({
-        "Date": dates,
-        "Open": close * np.random.uniform(0.98, 1.0, len(dates)),
-        "High": close * np.random.uniform(1.0, 1.03, len(dates)),
-        "Low": close * np.random.uniform(0.97, 1.0, len(dates)),
-        "Close": close,
-        "Volume": np.random.randint(1000000, 50000000, len(dates))
-    })
-
-    df.to_csv(path, index=False)
-    print(f"✅ {ticker} généré — {len(df)} jours")
+if __name__ == "__main__":
+    for t in ["AAPL", "TSLA", "NVDA"]:
+        download_ticker(t)
