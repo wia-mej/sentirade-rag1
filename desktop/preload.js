@@ -1,5 +1,7 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
-    // We can add IPC communication here if needed
+    minimizeWindow: () => ipcRenderer.send('minimize-window'),
+    maximizeWindow: () => ipcRenderer.send('maximize-window'),
+    closeWindow: () => ipcRenderer.send('close-window')
 });

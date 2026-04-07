@@ -26,7 +26,10 @@ function createWindow() {
 }
 
 function startBackend() {
-    const venvPath = path.join(__dirname, '..', 'venv', 'bin', 'python');
+    const isWindows = process.platform === 'win32';
+    const venvPath = isWindows 
+        ? path.join(__dirname, '..', 'venv', 'Scripts', 'python.exe')
+        : path.join(__dirname, '..', 'venv', 'bin', 'python');
     const apiPath = path.join(__dirname, '..', 'api.py');
 
     pythonProcess = spawn(venvPath, [apiPath], {

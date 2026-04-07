@@ -83,18 +83,25 @@ body {
 
 .window-controls {
     display: flex;
-    gap: 16px;
+    gap: 12px;
     -webkit-app-region: no-drag;
 }
 
-.window-controls span {
+.window-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
     cursor: pointer;
-    font-size: 0.8rem;
     color: var(--text-muted);
     transition: color 0.2s;
+    padding: 0;
 }
 
-.window-controls span:hover {
+.window-btn:hover {
     color: white;
 }
 

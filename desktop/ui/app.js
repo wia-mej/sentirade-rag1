@@ -149,10 +149,17 @@ tickerInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') runAnalysis(false);
 });
 
-// Window controls (mocked since we don't have direct IPC in simple example, 
-// but would normally use ipcRenderer)
+// Window controls
+document.getElementById('min-btn').addEventListener('click', () => {
+    window.electronAPI.minimizeWindow();
+});
+
+document.getElementById('max-btn').addEventListener('click', () => {
+    window.electronAPI.maximizeWindow();
+});
+
 document.getElementById('close-btn').addEventListener('click', () => {
-    window.close();
+    window.electronAPI.closeWindow();
 });
 
 // View Switching Logic
