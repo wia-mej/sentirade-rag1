@@ -22,7 +22,7 @@ def update_regime_labels():
     features["regime_id"] = gmm.fit_predict(X)
     
     features[["ticker", "regime_id"]].to_csv("data/regime_labels.csv")
-    print("✅ regime_labels.csv mis à jour")
+    print("[SUCCESS] regime_labels.csv updated")
     return features
 
 def get_regime(ticker, date):

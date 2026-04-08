@@ -39,7 +39,7 @@ def process_features(ticker):
         updated = feat.dropna()
         
     updated.to_csv(output_path)
-    print(f"✅ Features mises à jour pour {ticker}")
+    print(f"[SUCCESS] Features updated for {ticker}")
     return updated
 
 if __name__ == "__main__":

@@ -12,7 +12,7 @@ try:
     if os.path.exists("data/feature_matrix_final.csv"):
         df = pd.read_csv("data/feature_matrix_final.csv")
     elif os.path.exists("data/features_technical.csv"):
-        print("⚠️ feature_matrix_final.csv manquant, utilisation de features_technical.csv + regime_labels.")
+        print("[WARNING] feature_matrix_final.csv missing, using features_technical.csv + regime_labels.")
         df = pd.read_csv("data/features_technical.csv", index_col=0, parse_dates=True)
         
         # Charger les régimes
@@ -29,10 +29,10 @@ try:
         df["rag_signal"] = "hold"
         df["date"] = df.index
     else:
-        print("❌ Aucune donnée trouvée dans 'data/'. Veuillez d'abord analyser un ticker.")
+        print("[ERROR] No data found in 'data/'. Please analyze a ticker first.")
         sys.exit(1)
 except Exception as e:
-    print(f"❌ Erreur chargement données : {e}")
+    print(f"[ERROR] Data loading error: {e}")
     sys.exit(1)
 
 df = df.sort_values("date").reset_index(drop=True)
@@ -67,7 +67,7 @@ for f in data_files:
 
 # Télécharger le benchmark réel (S&P 500) s'il manque
 if "^GSPC" not in prices:
-    print("📥 Téléchargement du benchmark S&P 500 (^GSPC)...")
+    print("[FETCH] Downloading S&P 500 benchmark (^GSPC)...")
     import yfinance as yf
     try:
         sp500 = yf.download("^GSPC", period="5y")
@@ -76,7 +76,7 @@ if "^GSPC" not in prices:
         prices["^GSPC"] = sp500["Close"]
         sp500.reset_index().to_csv("data/^GSPC_ohlcv.csv", index=False)
     except Exception as e:
-        print(f"⚠️ Impossible de télécharger le benchmark : {e}")
+        print(f"[WARNING] Could not download benchmark: {e}")
         prices["^GSPC"] = None
 
 # ── Calculer les targets ──
@@ -184,7 +184,7 @@ trading_metrics = {
     "total_return_pct": round(float((portfolio_values.iloc[-1] - 10000) / 100), 2),
     "status": "Alpha Generated" if sharpe > 1.2 else "Preservation Mode"
 }
-print("📊 Métriques Trading :", trading_metrics)
+print("[METRICS] Trading Metrics:", trading_metrics)
 
 # ── Graphique Professionnel (Real-World Benchmark) ──
 plt.figure(figsize=(14, 7))
@@ -209,4 +209,4 @@ plt.savefig("data/backtest_chart.png", dpi=120, transparent=True)
 with open("data/trading_metrics.json", "w") as f:
     json.dump(trading_metrics, f, indent=2)
 
-print("✅ Backtesting terminé et graphique mis à jour !")
+print("[SUCCESS] Backtesting terminé et graphique mis à jour !")

@@ -9,14 +9,14 @@ def download_ticker(ticker, period="5y", force=False):
     path = f"data/{ticker}_ohlcv.csv"
     
     if not force and os.path.exists(path) and os.path.getsize(path) > 100:
-        print(f"⏭️ {ticker} déjà présent — skip")
+        print(f"[SKIP] {ticker} already present")
         return True
 
-    print(f"📥 Téléchargement des données pour {ticker} (période={period})...")
+    print(f"[FETCH] Downloading data for {ticker} (period={period})...")
     try:
         df = yf.download(ticker, period=period)
         if df.empty:
-            print(f"❌ Aucune donnée trouvée pour {ticker}")
+            print(f"[ERROR] No data found for {ticker}")
             return False
         
         # Nettoyage yfinance (parfois multi-index)
@@ -25,10 +25,10 @@ def download_ticker(ticker, period="5y", force=False):
             
         df = df.reset_index()
         df.to_csv(path, index=False)
-        print(f"✅ {ticker} sauvegardé — {len(df)} lignes")
+        print(f"[SUCCESS] {ticker} saved — {len(df)} rows")
         return True
     except Exception as e:
-        print(f"❌ Erreur lors du téléchargement de {ticker}: {e}")
+        print(f"[ERROR] Download error for {ticker}: {e}")
         return False
 
 if __name__ == "__main__":

@@ -11,6 +11,7 @@
 </head>
 
 <body>
+    <div id="notification-container" class="notification-container"></div>
     <div class="app-container">
         <!-- Title Bar for Frameless Window -->
         <div class="title-bar">
@@ -69,9 +70,9 @@
                     </div>
                 </nav>
                 <div class="sidebar-footer">
-                    <div class="status-indicator">
-                        <span class="pulse green"></span>
-                        <span>API Online</span>
+                    <div class="status-indicator" id="backend-status-indicator">
+                        <span class="pulse gray" id="backend-status-dot"></span>
+                        <span id="backend-status-text">Backend Offline</span>
                     </div>
                 </div>
             </aside>
@@ -137,6 +138,17 @@
                             </div>
                         </div>
 
+                        <!-- Full Width: Final Reasoning -->
+                        <div class="card reasoning-card" id="reasoning-summary-card" style="display: none;">
+                            <div class="card-header">
+                                <h3>Final Analysis Summary</h3>
+                                <div class="ai-badge">AGENT INSIGHT</div>
+                            </div>
+                            <div class="reasoning-content" id="reasoning-summary">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+
                         <!-- Bottom: News / Data Feed -->
                         <div class="card news-card">
                             <h3>Market Catalysts</h3>
@@ -173,15 +185,126 @@
                 <!-- Settings View -->
                 <div id="view-settings" class="view">
                     <header class="content-header">
-                        <h2>Configuration</h2>
+                        <h2>System Configuration</h2>
                     </header>
-                    <div class="card settings-card">
-                        <h3>API Configuration</h3>
-                        <div class="form-group">
-                            <label>Groq API Key</label>
-                            <input type="password" id="api-key-input" placeholder="gsk_...">
-                            <button id="save-settings-btn">Save Configuration</button>
+
+                    <div class="settings-grid">
+                        <!-- API Section -->
+                        <div class="card settings-card">
+                            <div class="card-header">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                                <h3>API Authentication</h3>
+                            </div>
+                            <div class="settings-content">
+                                <div class="form-group">
+                                    <label>Groq API Key</label>
+                                    <div class="input-wrapper">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" class="input-icon">
+                                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                        </svg>
+                                        <input type="password" id="api-key-input" placeholder="gsk_...">
+                                    </div>
+                                    <p class="field-desc">Required for Agent ReAct reasoning and signal generation.</p>
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- Analysis Params Section -->
+                        <div class="card settings-card">
+                            <div class="card-header">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                    <path
+                                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                                    </path>
+                                </svg>
+                                <h3>Analysis Parameters</h3>
+                            </div>
+                            <div class="settings-content">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Max Iterations</label>
+                                        <div class="input-wrapper">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2" class="input-icon">
+                                                <polyline points="23 4 23 10 17 10"></polyline>
+                                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                                            </svg>
+                                            <input type="number" id="max-iter-input" min="1" max="10" value="3">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>News Count</label>
+                                        <div class="input-wrapper">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2" class="input-icon">
+                                                <path
+                                                    d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2">
+                                                </path>
+                                                <path d="M18 14h-8"></path>
+                                                <path d="M15 18h-5"></path>
+                                                <path d="M10 6h8v4h-8V6Z"></path>
+                                            </svg>
+                                            <input type="number" id="news-count-input" min="1" max="10" value="5">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Preferred Model</label>
+                                    <div class="input-wrapper">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" class="input-icon">
+                                            <path
+                                                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                                            </path>
+                                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                                        </svg>
+                                        <select id="model-select">
+                                            <option value="llama-3.3-70b-versatile">Meta Llama 3.3 (70B) - Versatile
+                                            </option>
+                                            <option value="llama-3.1-8b-instant">Meta Llama 3.1 (8B) - Instant</option>
+                                            <option value="mixtral-8x7b-32768">Mixtral 8x7b Instruct (32k)</option>
+                                            <option value="deepseek-r1-distill-llama-70b">DeepSeek R1 Distill Llama 70B
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <p class="field-desc">Choose the engine that powers the ReAct agent.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- System Specs Section -->
+                        <div class="card settings-card">
+                            <div class="card-header">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                                </svg>
+                                <h3>Core Diagnostics</h3>
+                            </div>
+                            <div class="settings-content">
+                                <ul class="diag-list">
+                                    <li><span>Backend Version:</span> <span class="diag-val">v1.0.0</span></li>
+                                    <li><span>Uptime:</span> <span class="diag-val" id="uptime-val">Calculant...</span>
+                                    </li>
+                                    <li><span>Connection:</span> <span class="diag-val" id="connection-type">Localhost
+                                            Loopback</span></li>
+                                    <li><span>RAG Engine:</span> <span class="diag-val">ChromaDB (Active)</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-footer">
+                        <button id="save-settings-btn" class="primary-btn">Apply & Save Configuration</button>
                     </div>
                 </div>
             </main>

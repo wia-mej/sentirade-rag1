@@ -5,12 +5,16 @@ import json
 
 load_dotenv()
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-
-def generate_signal(ticker, date, news, regime):
+def generate_signal(ticker, date, news, regime, api_key=None, model=None):
     """
     Envoie les news et le régime au LLM et retourne un signal JSON
     """
+    # Use dynamic model or fallback
+    target_model = model or os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+    
+    # Initialize client dynamically
+    key = api_key or os.getenv("GROQ_API_KEY")
+    client = Groq(api_key=key)
     news_text = "\n".join([f"- {n['headline']}" for n in news])
     
     prompt = f"""
@@ -32,7 +36,7 @@ Return ONLY a valid JSON object with this exact structure:
 """
 
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model=target_model,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.1
     )
@@ -61,5 +65,5 @@ if __name__ == "__main__":
     regime = get_market_regime(ticker, date)
     
     signal = generate_signal(ticker, date, news, regime)
-    print(f"✅ Signal généré :")
+    print(f"[SUCCESS] Signal generated:")
     print(json.dumps(signal, indent=2))

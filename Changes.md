@@ -4,7 +4,7 @@ This document outlines the core logic transformations and provides a guide for s
 
 ---
 
-## 🏗️ Core Logic Deep Dive
+## Core Logic Deep Dive
 
 The architecture has evolved from a static prototype to a dynamic, real-time-ready benchmarking engine.
 
@@ -25,12 +25,12 @@ The `search_news_db` tool has transitioned from a simple DB query into a proacti
 
 ---
 
-## 🎨 Aesthetic Vision
+## Aesthetic Vision
 The project has adopted a **"Mission Control"** aesthetic—a premium financial dashboard look utilizing dark mode, and micro-animations for real-time status tracking.
 
 ---
 
-## ⚙️ Installation & Setup
+## Installation & Setup
 
 ### 1. Prerequisites
 - **Python:** 3.10+
