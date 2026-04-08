@@ -306,9 +306,44 @@ async function runAnalysis(force = false) {
             }
 
             if (regime) {
-                regimeText.innerText = regime.regime_name || 'Unknown';
+                regimeText.innerText = regime.regime_name || `Regime ${regime.regime_id}`;
+                regimeText.style.color = '#a78bfa';
             } else {
                 regimeText.innerText = 'Unknown';
+            }
+
+            // Populate Benchmarks
+            const benchContainer = document.getElementById('benchmark-stats-container');
+            if (data.benchmarks && data.ticker_metrics) {
+                if (benchContainer) benchContainer.style.display = 'flex';
+
+                // RSI
+                const rsiVal = data.ticker_metrics.rsi;
+                const rsiMean = data.benchmarks.rsi_mean;
+                const rsiDiff = rsiVal - rsiMean;
+                const rsiElem = document.querySelector('#bench-rsi .bench-value');
+                const rsiDiffElem = document.querySelector('#bench-rsi .bench-diff');
+
+                if (rsiElem) rsiElem.innerText = Math.round(rsiVal);
+                if (rsiDiffElem) {
+                    rsiDiffElem.innerText = `${rsiDiff >= 0 ? '+' : ''}${Math.round(rsiDiff)}`;
+                    rsiDiffElem.className = `bench-diff ${rsiDiff > 5 ? 'positive' : (rsiDiff < -5 ? 'negative' : 'neutral')}`;
+                }
+
+                // Volatility
+                const volVal = data.ticker_metrics.volatility;
+                const volMean = data.benchmarks.volatility_mean;
+                const volDiff = ((volVal - volMean) / volMean) * 100;
+                const volElem = document.querySelector('#bench-vol .bench-value');
+                const volDiffElem = document.querySelector('#bench-vol .bench-diff');
+
+                if (volElem) volElem.innerText = volVal.toFixed(3);
+                if (volDiffElem) {
+                    volDiffElem.innerText = `${volDiff >= 0 ? '+' : ''}${Math.round(volDiff)}%`;
+                    volDiffElem.className = `bench-diff ${volDiff < -10 ? 'positive' : (volDiff > 10 ? 'negative' : 'neutral')}`;
+                }
+            } else {
+                if (benchContainer) benchContainer.style.display = 'none';
             }
 
             agentStatus.innerText = 'IDLE';

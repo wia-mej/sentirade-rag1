@@ -1,9 +1,9 @@
 {
-  "period": "2025-04-07 to 2026-04-06",
-  "sharpe_ratio": 2.022,
-  "risk_reduction": "20.8% less volatile than S&P 500",
-  "drawdown_protection": "1.4x safer than S&P 500",
-  "win_rate": "57.0%",
-  "total_return_pct": 29.12,
+  "period": "2024-11-08 to 2026-04-06",
+  "sharpe_ratio": 1.324,
+  "risk_reduction": "23.0% vs S&P 500",
+  "win_rate": "53.6%",
+  "total_return_pct": 26.34,
+  "drawdown": "-7.34%",
   "status": "Alpha Generated"
 }

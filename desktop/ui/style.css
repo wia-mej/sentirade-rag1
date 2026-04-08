@@ -341,6 +341,63 @@ nav {
     margin-bottom: 24px;
 }
 
+/* Benchmarking Stats */
+.benchmark-stats {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.benchmark-item {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.bench-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.bench-value-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.bench-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.bench-diff {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.bench-diff.positive {
+    color: #10b981;
+}
+
+.bench-diff.negative {
+    color: #ef4444;
+}
+
+.bench-diff.neutral {
+    color: var(--text-muted);
+}
+
 .reasoning-card {
     grid-column: 1 / -1;
     background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(20, 20, 28, 1) 100%);

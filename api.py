@@ -48,7 +48,7 @@ async def get_signal(
         if not success:
             raise HTTPException(status_code=404, detail=f"Ticker {ticker} not found on yfinance.")
         
-        process_features(ticker)
+        feat_data = process_features(ticker)
         update_regime_labels()
 
     try:
@@ -60,12 +60,17 @@ async def get_signal(
             api_key=x_groq_api_key,
             model=x_model_name
         )
+        # Re-fetch or use latest calculation
+        feat_data = process_features(ticker)
+        
         return {
             "ticker": ticker,
             "date": date,
             "signal": signal,
             "regime": regime,
-            "logs": logs
+            "logs": logs,
+            "benchmarks": feat_data["market_benchmarks"],
+            "ticker_metrics": feat_data["ticker_features"]
         }
     except Exception as e:
         import traceback

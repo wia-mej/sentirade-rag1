@@ -40,7 +40,23 @@ def process_features(ticker):
         
     updated.to_csv(output_path)
     print(f"[SUCCESS] Features updated for {ticker}")
-    return updated
+
+    # Calculate Benchmarks (Global Universe stats)
+    # We take the mean/std of the entire universe to provide context
+    benchmark_stats = {
+        "rsi_mean": float(updated["rsi"].mean()),
+        "volatility_mean": float(updated["volatility"].mean()),
+        "spread_mean": float(updated["ma_spread"].mean())
+    }
+
+    # Extract latest features for this ticker
+    latest = feat.iloc[-1].to_dict()
+    latest["date"] = feat.index[-1].strftime("%Y-%m-%d")
+
+    return {
+        "ticker_features": latest,
+        "market_benchmarks": benchmark_stats
+    }
 
 if __name__ == "__main__":
     for t in ["AAPL", "TSLA", "NVDA"]:
