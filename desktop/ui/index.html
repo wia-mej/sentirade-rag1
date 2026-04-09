@@ -125,7 +125,6 @@
                                     <span class="value" id="regime-text">Stable</span>
                                 </div>
                             </div>
-                            <!-- Benchmark Stats Section -->
                             <div class="benchmark-stats" id="benchmark-stats-container" style="display: none;">
                                 <div class="benchmark-item" id="bench-rsi">
                                     <span class="bench-label">RSI vs. Universe</span>
@@ -139,6 +138,23 @@
                                     <div class="bench-value-row">
                                         <span class="bench-value">--</span>
                                         <span class="bench-diff">--</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- XGBoost Layer -->
+                            <div class="xgb-prediction" id="xgb-container"
+                                style="display: none; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
+                                <div class="benchmark-item">
+                                    <span class="bench-label">XGBoost Direction</span>
+                                    <div class="bench-value-row">
+                                        <span class="bench-value" id="xgb-direction">--</span>
+                                        <span class="bench-diff" id="xgb-prob">--</span>
+                                    </div>
+                                </div>
+                                <div class="benchmark-item">
+                                    <span class="bench-label">Predicted Amplitude</span>
+                                    <div class="bench-value-row">
+                                        <span class="bench-value" id="xgb-amplitude">--</span>
                                     </div>
                                 </div>
                             </div>

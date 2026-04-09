@@ -52,7 +52,7 @@ async def get_signal(
         update_regime_labels()
 
     try:
-        signal, regime, logs = run_agent(
+        signal, regime, logs, xgb = run_agent(
             ticker, 
             date, 
             max_iter=max_iter, 
@@ -69,6 +69,7 @@ async def get_signal(
             "signal": signal,
             "regime": regime,
             "logs": logs,
+            "xgb": xgb,
             "benchmarks": feat_data["market_benchmarks"],
             "ticker_metrics": feat_data["ticker_features"]
         }

@@ -145,18 +145,28 @@ for ticker in df_test["ticker"].unique():
             bh_rets.append(daily_bh_ret)
             
             strat_ret = 0.0
-            if signal in ["buy", "hold"] and not in_position:
+            # Aggressive Weights: BUY=1.2, HOLD=1.0. Amplitude is a kicker.
+            is_buy = signal == "buy"
+            is_hold = signal == "hold"
+            base_weight = 1.2 if is_buy else 1.0 if is_hold else 0.0
+            
+            amp_pred = abs(t_df.iloc[i].get("amplitude_predite", 0.01))
+            # Kicker: if predicted move > 1.5%, boost position further
+            kicker = max(amp_pred / 0.015, 1.0)
+            pos_multiplier = min(base_weight * kicker, 2.0)
+            
+            if (is_buy or is_hold) and not in_position:
                 # Execution: Buy at T+1 Open
                 ret_trade = (p_close_next - p_open_next) / p_open_next
-                strat_ret = ret_trade - (COMMISSION + SLIPPAGE)
+                strat_ret = (ret_trade * pos_multiplier) - (COMMISSION + SLIPPAGE)
                 in_position = True
             elif signal == "sell" and in_position:
                 # Execution: Sell at T+1 Open
                 ret_trade = (p_open_next - p_close_curr) / p_close_curr
-                strat_ret = ret_trade - (COMMISSION + SLIPPAGE)
+                strat_ret = (ret_trade * pos_multiplier) - (COMMISSION + SLIPPAGE)
                 in_position = False
             elif in_position:
-                strat_ret = daily_bh_ret
+                strat_ret = daily_bh_ret * pos_multiplier
             else:
                 strat_ret = 0.0
                 

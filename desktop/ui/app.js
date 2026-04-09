@@ -226,6 +226,9 @@ function resetUI(ticker) {
 
     const reasoningCard = document.getElementById('reasoning-summary-card');
     if (reasoningCard) reasoningCard.style.display = 'none';
+
+    const xgbContainer = document.getElementById('xgb-container');
+    if (xgbContainer) xgbContainer.style.display = 'none';
 }
 
 // Handle Analysis
@@ -266,7 +269,10 @@ async function runAnalysis(force = false) {
             data.logs.forEach((log, i) => {
                 setTimeout(() => {
                     addLog(`[Iteration ${log.iteration}] ${log.reasoning}`, 'thinking');
-                    addLog(`Executing Action: ${log.action}`, 'acting');
+                    addLog(`Action: ${log.action}`, 'acting');
+                    if (log.findings) {
+                        addLog(`Findings: ${log.findings}`, 'result');
+                    }
                 }, i * 800);
             });
         }
@@ -277,6 +283,7 @@ async function runAnalysis(force = false) {
         setTimeout(() => {
             const signal = data.signal;
             const regime = data.regime;
+            const xgb = data.xgb;
 
             if (signal) {
                 displaySignal.innerText = signal.signal.toUpperCase();
@@ -299,10 +306,22 @@ async function runAnalysis(force = false) {
                         reasoningCard.style.display = 'block';
                     }
                 }
-            } else {
-                displaySignal.innerText = 'NEUTRAL';
-                displaySignal.className = 'main-signal hold';
-                addLog('Warning: Agent completed without a definitive signal. Defaulting to Neutral.', 'system');
+            }
+
+            // XGBoost Results
+            const xgbContainer = document.getElementById('xgb-container');
+            const xgbDir = document.getElementById('xgb-direction');
+            const xgbProb = document.getElementById('xgb-prob');
+            const xgbAmp = document.getElementById('xgb-amplitude');
+
+            if (xgb && xgbContainer) {
+                xgbContainer.style.display = 'block';
+                xgbDir.innerText = (xgb.direction || 'Unknown').toUpperCase();
+                xgbDir.style.color = xgb.direction === 'hausse' ? '#10b981' : '#ef4444';
+                xgbProb.innerText = `${Math.round((xgb.probabilite || 0) * 100)}%`;
+                xgbAmp.innerText = `${xgb.amplitude_predite > 0 ? '+' : ''}${(xgb.amplitude_predite * 100).toFixed(2)}%`;
+
+                addLog(`ML Intel: XGBoost predicts ${xgb.direction.toUpperCase()} with ${Math.round(xgb.probabilite * 100)}% probability.`, 'result');
             }
 
             if (regime) {
