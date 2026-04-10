@@ -99,13 +99,14 @@ def _predict_xgboost(technical_features, regime_id, sentiment, confidence, rag_s
     }
 
 
-def run_agent(ticker, date, max_iter=3, n_results=3, api_key=None, model=None):
+def run_agent(ticker, date, n_results=3, api_key=None, model=None):
     """
-    Orchestrated 3-Layer ReAct Loop (Max 3 iterations)
+    Orchestrated 3-Layer ReAct Loop
     Layer 1: Market Context    (yfinance -> Indicators -> GMM Regime)
     Layer 2: News Intelligence (Headlines -> ChromaDB -> Groq LLaMA)
     Layer 3: Decision          (7-feature Matrix -> XGBoost)
     """
+    max_iter = 3
     print(f"\n🚀 Analysis for {ticker} on {date}")
     print("=" * 60)
 

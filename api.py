@@ -28,13 +28,11 @@ async def get_signal(
     ticker: str, 
     date: str = None, 
     force: bool = False, 
-    max_iter: int = Query(None),
     n_results: int = Query(None),
     x_groq_api_key: str = Header(None, alias="X-Groq-API-Key"),
     x_model_name: str = Header(None, alias="X-Model-Name")
 ):
     # Dynamic defaults and clamping
-    max_iter = min(max(int(max_iter or 3), 1), 20)
     n_results = min(max(int(n_results or 5), 1), 50)
     ticker = ticker.upper()
     if not date:
@@ -55,7 +53,6 @@ async def get_signal(
         signal, regime, logs, xgb = run_agent(
             ticker, 
             date, 
-            max_iter=max_iter, 
             n_results=n_results,
             api_key=x_groq_api_key,
             model=x_model_name

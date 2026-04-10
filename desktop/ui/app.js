@@ -21,7 +21,6 @@ const statusText = document.getElementById('backend-status-text');
 
 const DEFAULT_SETTINGS = {
     apiKey: '',
-    maxIter: 3,
     newsCount: 5,
     model: 'llama-3.3-70b-versatile'
 };
@@ -36,7 +35,6 @@ function loadSettings() {
             const parsed = JSON.parse(saved);
             currentSettings = {
                 apiKey: parsed.apiKey || DEFAULT_SETTINGS.apiKey,
-                maxIter: Number(parsed.maxIter) || DEFAULT_SETTINGS.maxIter,
                 newsCount: Number(parsed.newsCount) || DEFAULT_SETTINGS.newsCount,
                 model: parsed.model || DEFAULT_SETTINGS.model
             };
@@ -51,18 +49,15 @@ function loadSettings() {
 
     // Populate UI
     if (document.getElementById('api-key-input')) document.getElementById('api-key-input').value = currentSettings.apiKey;
-    if (document.getElementById('max-iter-input')) document.getElementById('max-iter-input').value = currentSettings.maxIter;
     if (document.getElementById('news-count-input')) document.getElementById('news-count-input').value = currentSettings.newsCount;
     if (document.getElementById('model-select')) document.getElementById('model-select').value = currentSettings.model;
 }
 
 function saveSettings() {
-    const rawMaxIter = parseInt(document.getElementById('max-iter-input').value);
     const rawNewsCount = parseInt(document.getElementById('news-count-input').value);
 
     currentSettings = {
         apiKey: document.getElementById('api-key-input').value,
-        maxIter: Math.max(rawMaxIter, 1),
         newsCount: Math.max(rawNewsCount, 1),
         model: document.getElementById('model-select').value
     };
@@ -253,8 +248,8 @@ async function runAnalysis(force = false) {
         addLog(`Found ${newsData.news.length} news items (${shownCount} unique displayed).`, 'result');
 
         // Now run the full agent
-        addLog(`Starting Agent ReAct loop (Max Iterations: ${currentSettings.maxIter})...`, 'thinking');
-        const res = await fetchWithTimeout(`${API_URL}/signal/${ticker}?max_iter=${currentSettings.maxIter}&n_results=${currentSettings.newsCount}`, {
+        addLog(`Starting Agent ReAct loop...`, 'thinking');
+        const res = await fetchWithTimeout(`${API_URL}/signal/${ticker}?n_results=${currentSettings.newsCount}`, {
             method: 'GET',
             headers: {
                 'X-Groq-API-Key': currentSettings.apiKey,
