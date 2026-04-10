@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentirade RAG - Command Center</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div id="notification-container" class="notification-container"></div>
+    <div class="app-container">
+        <!-- Title Bar for Frameless Window -->
+        <div class="title-bar">
+            <div class="drag-region">
+                <span class="app-logo">Sentirade <span class="accent">RAG</span></span>
+            </div>
+            <div class="window-controls">
+                <button id="min-btn" class="window-btn" title="Minimize">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </button>
+                <button id="max-btn" class="window-btn" title="Maximize">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="5" y="5" width="12" height="12" rx="2" ry="2"></rect>
+                    </svg>
+                </button>
+                <button id="close-btn" class="window-btn" title="Close">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="main-layout">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <nav>
+                    <div class="nav-item active" data-view="dashboard">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                        <span>Dashboard</span>
+                    </div>
+                    <div class="nav-item" data-view="backtest">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                            <polyline points="17 6 23 6 23 12"></polyline>
+                        </svg>
+                        <span>Backtest</span>
+                    </div>
+                    <div class="nav-item" data-view="settings">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path
+                                d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z">
+                            </path>
+                        </svg>
+                        <span>Settings</span>
+                    </div>
+                </nav>
+                <div class="sidebar-footer">
+                    <div class="status-indicator" id="backend-status-indicator">
+                        <span class="pulse gray" id="backend-status-dot"></span>
+                        <span id="backend-status-text">Backend Offline</span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="content">
+                <!-- Dashboard View -->
+                <div id="view-dashboard" class="view active">
+                    <header class="content-header">
+                        <div class="search-container">
+                            <input type="text" id="ticker-search" placeholder="Enter Ticker (e.g. AAPL, NVDA)...">
+                            <button id="analyze-btn">Analyze Sentiment</button>
+                            <button id="refresh-btn" title="Force Refresh Data">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M23 4v6h-6"></path>
+                                    <path d="M1 20v-6h6"></path>
+                                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15">
+                                    </path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="header-info">
+                            <span id="current-date"></span>
+                        </div>
+                    </header>
+
+                    <div class="dashboard-grid">
+                        <!-- Left: Signal & Sentiment -->
+                        <div class="card signal-card">
+                            <h3>Decision Engine</h3>
+                            <div class="signal-display">
+                                <div class="ticker-badge" id="display-ticker">WAITING</div>
+                                <div class="main-signal" id="display-signal">--</div>
+                                <div class="confidence-bar-container">
+                                    <span>Confidence</span>
+                                    <div class="progress-bg">
+                                        <div class="progress-fill" id="confidence-fill"></div>
+                                    </div>
+                                    <span id="confidence-value">0%</span>
+                                </div>
+                            </div>
+                            <div class="sentiment-gauges">
+                                <div class="gauge">
+                                    <span class="label">Sentiment</span>
+                                    <span class="value" id="sentiment-text">Neutral</span>
+                                </div>
+                                <div class="gauge">
+                                    <span class="label">Market Regime</span>
+                                    <span class="value" id="regime-text">Stable</span>
+                                </div>
+                            </div>
+                            <div class="benchmark-stats" id="benchmark-stats-container" style="display: none;">
+                                <div class="benchmark-item" id="bench-rsi">
+                                    <span class="bench-label">RSI vs. Universe</span>
+                                    <div class="bench-value-row">
+                                        <span class="bench-value">--</span>
+                                        <span class="bench-diff">--</span>
+                                    </div>
+                                </div>
+                                <div class="benchmark-item" id="bench-vol">
+                                    <span class="bench-label">VOL vs. Universe</span>
+                                    <div class="bench-value-row">
+                                        <span class="bench-value">--</span>
+                                        <span class="bench-diff">--</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- XGBoost Layer -->
+                            <div class="xgb-prediction" id="xgb-container"
+                                style="display: none; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
+                                <div class="benchmark-item">
+                                    <span class="bench-label">XGBoost Direction</span>
+                                    <div class="bench-value-row">
+                                        <span class="bench-value" id="xgb-direction">--</span>
+                                        <span class="bench-diff" id="xgb-prob">--</span>
+                                    </div>
+                                </div>
+                                <div class="benchmark-item">
+                                    <span class="bench-label">Predicted Amplitude</span>
+                                    <div class="bench-value-row">
+                                        <span class="bench-value" id="xgb-amplitude">--</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Reasonning Log -->
+                        <div class="card log-card">
+                            <div class="card-header">
+                                <h3>Agent Thought Stream</h3>
+                                <span class="status-badge" id="agent-status">IDLE</span>
+                            </div>
+                            <div class="log-container" id="thought-log">
+                                <div class="log-entry system">System initialized. Waiting for ticker analysis...</div>
+                            </div>
+                        </div>
+
+                        <!-- Full Width: Final Reasoning -->
+                        <div class="card reasoning-card" id="reasoning-summary-card" style="display: none;">
+                            <div class="card-header">
+                                <h3>Final Analysis Summary</h3>
+                                <div class="ai-badge">AGENT INSIGHT</div>
+                            </div>
+                            <div class="reasoning-content" id="reasoning-summary">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Bottom: News / Data Feed -->
+                        <div class="card news-card">
+                            <h3>Market Catalysts</h3>
+                            <div class="news-list" id="news-container">
+                                <div class="news-placeholder">No news data available. Trigger an analysis to fetch
+                                    catalysts.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backtest View -->
+                <div id="view-backtest" class="view">
+                    <header class="content-header">
+                        <h2>Historical Performance</h2>
+                        <button id="run-backtest-btn" class="secondary-btn">Run Simulation</button>
+                    </header>
+                    <div class="backtest-grid">
+                        <div class="card chart-card">
+                            <h3>Equity Curve</h3>
+                            <div class="chart-wrapper">
+                                <img id="backtest-chart" src="../../data/backtest_chart.png" alt="Backtest Chart">
+                            </div>
+                        </div>
+                        <div class="card metrics-card">
+                            <h3>Trading Metrics</h3>
+                            <div id="metrics-container" class="metrics-list">
+                                <!-- Metrics go here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings View -->
+                <div id="view-settings" class="view">
+                    <header class="content-header">
+                        <h2>System Configuration</h2>
+                    </header>
+
+                    <div class="settings-grid">
+                        <!-- API Section -->
+                        <div class="card settings-card">
+                            <div class="card-header">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                                <h3>API Authentication</h3>
+                            </div>
+                            <div class="settings-content">
+                                <div class="form-group">
+                                    <label>Groq API Key</label>
+                                    <div class="input-wrapper">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" class="input-icon">
+                                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                        </svg>
+                                        <input type="password" id="api-key-input" placeholder="gsk_...">
+                                    </div>
+                                    <p class="field-desc">Required for Agent ReAct reasoning and signal generation.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Analysis Params Section -->
+                        <div class="card settings-card">
+                            <div class="card-header">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                    <path
+                                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                                    </path>
+                                </svg>
+                                <h3>Analysis Parameters</h3>
+                            </div>
+                            <div class="settings-content">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>News Count</label>
+                                        <div class="input-wrapper">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2" class="input-icon">
+                                                <path
+                                                    d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2">
+                                                </path>
+                                                <path d="M18 14h-8"></path>
+                                                <path d="M15 18h-5"></path>
+                                                <path d="M10 6h8v4h-8V6Z"></path>
+                                            </svg>
+                                            <input type="number" id="news-count-input" min="1" max="10" value="5">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Preferred Model</label>
+                                    <div class="input-wrapper">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" class="input-icon">
+                                            <path
+                                                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                                            </path>
+                                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                                        </svg>
+                                        <select id="model-select">
+                                            <option value="llama-3.3-70b-versatile">Meta Llama 3.3 (70B) - Versatile
+                                            </option>
+                                            <option value="llama-3.1-8b-instant">Meta Llama 3.1 (8B) - Instant</option>
+                                            <option value="mixtral-8x7b-32768">Mixtral 8x7b Instruct (32k)</option>
+                                            <option value="deepseek-r1-distill-llama-70b">DeepSeek R1 Distill Llama 70B
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <p class="field-desc">Choose the engine that powers the ReAct agent.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- System Specs Section -->
+                        <div class="card settings-card">
+                            <div class="card-header">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                                </svg>
+                                <h3>Core Diagnostics</h3>
+                            </div>
+                            <div class="settings-content">
+                                <ul class="diag-list">
+                                    <li><span>Backend Version:</span> <span class="diag-val">v1.0.0</span></li>
+                                    <li><span>Uptime:</span> <span class="diag-val" id="uptime-val">Calculant...</span>
+                                    </li>
+                                    <li><span>Connection:</span> <span class="diag-val" id="connection-type">Localhost
+                                            Loopback</span></li>
+                                    <li><span>RAG Engine:</span> <span class="diag-val">ChromaDB (Active)</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-footer">
+                        <button id="save-settings-btn" class="primary-btn">Apply & Save Configuration</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+
+</html>

@@ -1,6 +1,9 @@
 {
-  "sharpe_ratio": 5.282,
-  "max_drawdown": -0.491,
-  "total_return_pct": 649.59,
-  "final_portfolio": 74958.69
+  "period": "2026-03-06 to 2026-04-06",
+  "sharpe_ratio": 2.625,
+  "risk_reduction": "48.4% vs S&P 500",
+  "win_rate": "60.0%",
+  "total_return_pct": 2.01,
+  "drawdown": "-2.19%",
+  "status": "Alpha Generated"
 }

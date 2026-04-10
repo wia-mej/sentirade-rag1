@@ -9,7 +9,7 @@ import json
 
 # Charger la feature matrix
 df = pd.read_csv("data/feature_matrix_final.csv")
-print(f"✅ {len(df)} lignes chargées")
+print(f"[SUCCESS] {len(df)} rows loaded")
 
 # Encoder les colonnes catégorielles
 le_sentiment = LabelEncoder()
@@ -53,7 +53,7 @@ for _, row in df.iterrows():
 df["target_clf"] = targets_clf
 df["target_reg"] = targets_reg
 
-print(f"✅ Targets calculés — {sum(targets_clf)} haussiers / {len(targets_clf)-sum(targets_clf)} baissiers")
+print(f"[SUCCESS] Targets calculated — {sum(targets_clf)} bullish / {len(targets_clf)-sum(targets_clf)} bearish")
 
 # Split temporel
 df = df.sort_values("date")
@@ -75,10 +75,10 @@ y_clf_test = y_clf[val_size:]
 y_reg_train = y_reg[:train_size]
 y_reg_test = y_reg[val_size:]
 
-print(f"✅ Split — Train: {len(X_train)} | Val: {len(X_val)} | Test: {len(X_test)}")
+print(f"[SUCCESS] Split — Train: {len(X_train)} | Val: {len(X_val)} | Test: {len(X_test)}")
 
 # XGBoost Classifier
-print("\n🔄 Entraînement XGBoost Classifier...")
+print("\n[PROCESS] Training XGBoost Classifier...")
 clf = XGBClassifier(n_estimators=100, max_depth=4, learning_rate=0.1, random_state=42)
 clf.fit(X_train, y_clf_train)
 
@@ -92,7 +92,7 @@ metrics_clf = {
     "auc_roc": round(roc_auc_score(y_clf_test, y_prob), 3)
 }
 
-print(f"✅ Classifier — {metrics_clf}")
+print(f"[SUCCESS] Classifier — {metrics_clf}")
 
 with open("models/model_classifier.pkl", "wb") as f:
     pickle.dump(clf, f)
@@ -101,15 +101,15 @@ with open("data/metrics_clf.json", "w") as f:
     json.dump(metrics_clf, f, indent=2)
 
 # XGBoost Regressor
-print("\n🔄 Entraînement XGBoost Regressor...")
+print("\n[PROCESS] Training XGBoost Regressor...")
 reg = XGBRegressor(n_estimators=100, max_depth=4, learning_rate=0.1, random_state=42)
 reg.fit(X_train, y_reg_train)
 
 with open("models/model_regressor.pkl", "wb") as f:
     pickle.dump(reg, f)
 
-print("✅ Regressor sauvegardé")
-print("\n🎉 Training terminé !")
-print(f"   model_classifier.pkl ✅")
-print(f"   model_regressor.pkl  ✅")
-print(f"   metrics_clf.json     ✅")
+print("[SUCCESS] Regressor saved")
+print("\n[FINISH] Training complete!")
+print(f"   model_classifier.pkl [SUCCESS]")
+print(f"   model_regressor.pkl  [SUCCESS]")
+print(f"   metrics_clf.json     [SUCCESS]")

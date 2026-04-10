@@ -1,0 +1,12 @@
+{
+    "name": "sentirade-desktop",
+    "version": "1.0.0",
+    "description": "Premium RAG-based Trading Agent",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron ."
+    },
+    "dependencies": {
+        "electron": "^30.0.0"
+    }
+}
